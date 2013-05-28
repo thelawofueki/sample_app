@@ -1,0 +1,306 @@
+<div id="map-canvas" class="center"></div><br/>
+<div id="mainpart" class = "current-location" user-index="<%= @tracker.user_index %>">
+
+	<% if @tracker.lat == '' %>
+    <h4>Current Position: (<l id="currentlat">No data</l>, <l id="currentlong">No data</l>)</h4>
+	<h5>Status: <l id="currentcarStat"><%= @tracker.carStat %></l></h5>
+    <% else %>    
+    <h4>Current Position: (<l id="currentlat"><%= @tracker.lat %></l>, <l id="currentlong"><%= @tracker.longi %></l>)</h4>
+	<h5>Status: <l id="currentcarStat"><%= @tracker.carStat %></l></h5>
+	<% end %>
+		<!--<h6>(<%= @tracker.latlong %>, <%= @tracker.radii %>, <%= @tracker.marker_count %>)</h6><button type="button" class="btn" onclick="savetodatabase()">Update Bounds</button></br>
+	<button type="button" class="btn" onclick="checkPosition() ">Update</button></br>-->
+	<label id="position">
+</div>
+
+<style type="text/css">
+      #map-canvas {height: 500px;}
+      #map-canvas img {max-width: none;}
+</style>
+
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzjiRVz8-YGBx4PdJtFQV-pP7moTNEhHI&sensor=false"></script>
+	
+<script>
+	//global variables
+	var session = 0;
+	var map; //the map, duh
+	var allmarkers = '<%=@tracker.latlong%>'; //string used to contain all coordinates of markers set by the user
+	var allradii =  '<%=@tracker.radii%>';
+	var vehicle = [];
+	var vehiclepath = [];
+	var flightPath;
+	var blueIcon;
+	var LatLngList = [];// = new google.maps.LatLng (52.537,-2.061), new google.maps.LatLng (52.564,-2.017));
+	var bounds = new google.maps.LatLngBounds();
+
+	var marker = [];	//array storage of markers
+	var circle = [];	//array storage of marker circle radii
+	var order = parseFloat(<%=@tracker.marker_count%>);		//number of markers made by user
+	//initialize function
+	function initialize() {
+		//declare map options
+		var mapOptions = {
+			zoom: 16,
+			center: new google.maps.LatLng(14.643776821309585, 121.07474327087402),
+			mapTypeId: google.maps.MapTypeId.ROADMAP
+		};
+		//create map
+		map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+		//place saved markers by user
+		placeSavedMarkers(map);
+		//place vehicle position from last update
+		//first get vehicle path of coordinates and get the lates
+		getVehicleCoordinates();
+
+		
+
+		//initiates live checking of vehicle position
+		checkPosition();
+		//placeVehicle();
+		
+		//disabled: place markers in map
+		/*google.maps.event.addListener(map, 'click', function(e) {
+		placeMarker(e.latLng, map, order);
+		order+=1;
+		generateCoords();
+		});*/
+	}
+
+	function getVehicleCoordinates() {
+		var all_curlats = '<%=@tracker.lat%>';
+		var all_curlongs = '<%=@tracker.longi%>';
+
+		var array_curlats = all_curlats.split("*");
+		var array_curlongs = all_curlongs.split("*");
+
+		$('#currentlat').html(array_curlats[array_curlats.length-1]);
+		$('#currentlong').html(array_curlongs[array_curlongs.length-1]);
+		if (array_curlats.length != 0)
+		{
+			for(i=0;i<array_curlats.length;i++)
+		{
+			vehiclepath[i] =  new google.maps.LatLng(parseFloat(array_curlats[i]), parseFloat(array_curlongs[i]));
+			
+			if (i==0)
+			{
+				vehicle[i] = new google.maps.Marker({
+				position: new google.maps.LatLng(parseFloat(array_curlats[i]), parseFloat(array_curlongs[i])),
+				map: map,
+				icon: 'http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png',
+				animation: google.maps.Animation.DROP
+				});
+				vehicle[i].setTitle((i+1).toString());
+			}
+			else if (i == array_curlats.length-1 && i != 0)
+			{
+				vehicle[i] = new google.maps.Marker({
+				position: new google.maps.LatLng(parseFloat(array_curlats[i]), parseFloat(array_curlongs[i])),
+				map: map,
+				icon: 'http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png',
+				animation: google.maps.Animation.BOUNCE
+				});
+				vehicle[i].setTitle((i+1).toString());
+				//vehicle[i].setAnimation(google.maps.Animation.BOUNCE);
+			}
+			else
+			{
+				vehicle[i] = new google.maps.Marker({
+				position: new google.maps.LatLng(parseFloat(array_curlats[i]), parseFloat(array_curlongs[i])),
+				map: map,
+				icon: 'http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png'
+				//animation: google.maps.Animation.BOUNCE,
+				});
+				vehicle[i].setTitle((i+1).toString());
+				vehicle[i].setMap(null);
+			}
+		}
+		flightPath = new google.maps.Polyline({
+		    path: vehiclepath,
+		    strokeColor: '#15317E',
+		    strokeOpacity: 1.0,
+		    strokeWeight: 2
+	  	});
+		flightPath.setMap(map);
+
+		}
+		
+		
+	}
+	//update location of vehicle
+	function placeVehicle(){
+			//var curpos = new google.maps.LatLng(parseFloat(<%= @tracker.lat %>), parseFloat(<%= @tracker.longi %>));
+			var x = $("#currentlat").html();
+			var y = $("#currentlong").html();
+			var curpos = new google.maps.LatLng(parseFloat(x), parseFloat(y));
+			//var curpos = new google.maps.LatLng(parseFloat(<%= @tracker.lat %>), parseFloat(<%= @tracker.longi %>));
+			/*vehicle.setPosition(curpos);
+			if (!bounds.contains(curpos)){
+				bounds.extend(curpos);
+				map.fitBounds(bounds);
+			}*/
+
+
+			
+	}
+
+	//Code to place marker on map
+	function placeMarker(position, map, order) {
+		marker[order] = new google.maps.Marker({
+			position: position,
+			map: map
+		});
+		circle[order] = new google.maps.Circle({
+			strokeColor: '#000000',
+			strokeOpacity: 0.5,
+			strokeWeight: 1,
+			fillColor: '#FFFFFF',
+			fillOpacity: 0.35,
+			map: map,
+			center: position,
+			radius: 100,
+			draggable: false,
+			editable: true
+	    });
+		marker[order].setTitle((order+1).toString());
+		attachSecretMessage(marker[order], circle[order], map);
+	}
+
+	//Attach infowindows to markercoords, which when clicked will trigger the infowindows to open
+	function attachSecretMessage(current_marker, current_circle, map) {
+	  var infowindow = new google.maps.InfoWindow({
+		content: current_marker.getPosition().lat().toString() + '\n' + current_marker.getPosition().lng().toString()
+	  });
+	  google.maps.event.addListener(current_marker, 'click', function() {
+		infowindow.open(current_marker.get('map'), current_marker);
+	  });
+	  //Disabled: update circle position when marker is dragged
+	  /*google.maps.event.addListener(current_marker, 'dragend', function(evt){
+		current_circle.setCenter(current_marker.getPosition());
+		generateCoords();
+	  });
+	  //Disabled: update allradii when any of the circles' radii are modified
+	  google.maps.event.addListener(current_circle, 'radius_changed', function(evt){
+	  	generateCoords();
+	  });*/
+	  /*google.maps.event.addListener(current_marker, 'rightclick', function(){
+	  	current_marker.setMap(null);
+	  	current_circle.setMap(null);
+	  	deleteMarker(current_marker);
+	  	generateCoords();
+	  	removeMarkers();
+	  	//placeSavedMarkers(map);
+	  });*/
+	}
+
+	//Initialize goog map
+	google.maps.event.addDomListener(window, 'load', initialize);
+
+	//Stringify marker coordinates and circle radii and save to global variables
+	function generateCoords() {
+		allmarkers = '';
+		allradii = '';
+		for(i=0;i<order;i++)
+		{
+			var separator = '*';
+			var intermediary;
+			if (i==order-1){intermediary = '';}
+			else{intermediary = '*';}
+			allmarkers += marker[i].getPosition().lat().toString() + separator + marker[i].getPosition().lng().toString() + intermediary;
+			allradii += circle[i].getRadius().toString() + intermediary;
+		}
+		//placeStrings(); --> checker if generateCoords() works by showing global variables in text boxes
+	}
+
+	//Disabled: update the textboxes containing the strings to be inputted to the website
+	/*function placeStrings() {
+		var x = document.getElementById("position");
+		var y = document.getElementById("radii");
+		var z = document.getElementById("order");
+		x.value = allmarkers;
+		y.value = allradii;
+		z.value = order;
+	}*/
+
+	//Delete a set of marker coordinates from markers array
+	function deleteMarker(current_marker) {
+		var index = parseFloat(current_marker.getTitle())-1;
+		marker.splice(index,1);
+		circle.splice(index,1);
+		order -= 1;
+	}
+
+	//Place markers on google maps from stringified marker coordinates and circle radii
+	function placeSavedMarkers(map) {
+		
+		var markercoords = allmarkers.split("*");
+		var markercircles = allradii.split("*");
+		if (order > 0)
+		{
+			for(i=0;i<order;i++)
+			{
+				marker[i] = new google.maps.Marker({
+					position: new google.maps.LatLng(parseFloat(markercoords[2*i]), parseFloat(markercoords[2*i+1])),
+					draggable: false,
+					map: map
+				});
+				
+				circle[i] = new google.maps.Circle({
+					strokeColor: '#FFFFFF',
+					strokeOpacity: 0.5,
+					strokeWeight: 1,
+					fillColor: '#2554C7',
+					fillOpacity: 0.25,
+					map: map,
+					center: position,
+					center: new google.maps.LatLng(parseFloat(markercoords[2*i]), parseFloat(markercoords[2*i+1])),
+					radius: parseFloat(markercircles[i])
+		    	});
+		    	bounds.extend(new google.maps.LatLng(parseFloat(markercoords[2*i]), parseFloat(markercoords[2*i+1])));
+		    	map.fitBounds(bounds);
+		    	marker[i].setTitle((i+1).toString());
+				attachSecretMessage(marker[i], circle[i]);
+			}
+			
+		}
+		//placeStrings(); --> again, just for testing purposes
+	}
+
+	//Disabled: Imitates a call to the server from the mobile app
+	/*function savetodatabase() {
+		params = {
+			user_index: <%= @tracker.user_index %>,
+			latlong: allmarkers,
+			radii: allradii,
+			marker_count: order,
+			lat: '2',
+			longi: '4',
+			//lat: '14.643776821309585',
+			//longi: '121.07474327087402'
+			//carStat: '00002323'
+		}
+
+		$.post('/update', params, function(){
+			alert('successful');
+		});
+	}*/
+		
+	//Disabled: Renames all titles of markers on map to accomodate the loss of the deleted marker
+	/*function removeMarkers() {
+		for(i=0;i<order;i++)
+		{
+			marker[i].setTitle((i+1).toString())
+		}
+	}*/
+
+	//Live update of vehicle on map
+	function checkPosition() {
+		$.getScript("/trackers.js?user_index=" + <%= @tracker.user_index %>);
+		setTimeout(setPosition, 500);
+	}
+
+	function setPosition() {
+		placeVehicle();
+		setTimeout(checkPosition, 60000);
+	}
+
+</script>

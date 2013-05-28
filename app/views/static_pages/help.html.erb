@@ -1,8 +1,82 @@
-<% provide(:title, 'Help') %>
-<h1>Help</h1>
-<p>
-  Get help on the Ruby on Rails Tutorial at the
-  <a href="http://railstutorial.org/help">Rails Tutorial help page</a>.
-  To get help on this sample app, see the
-  <a href="http://railstutorial.org/book">Rails Tutorial book</a>.
+<% provide(:title, 'Get Started') %>
+<div class="hero-unit">
+<div class="center">
+<h1>Get Started</h1>
+ 
+  Start tracking your vehicle by going through the tutorial!
 </p>
+</div>
+<div class="tutorial">
+<h3>Edit bounds</h3><br/>
+	<%= image_tag "demo/edit.gif" %><br/>
+<p>
+	To define the route for your vehicle, proceed to <em>Account >> Edit Bounds</em>.
+</p><br/>
+<h3>Click to add route marker</h3><br/>
+	<%= image_tag "demo/click.gif" %><br/>
+<p>
+	Click anywhere on the Googlemap to position route markers for your vehicle. <em>Bounding circles</em> will automatically apear to mark the limits of the route.
+</p><br/>
+<h3>Resize bounding circle</h3><br/>
+	<%= image_tag "demo/resize.gif" %><br/>
+<p>
+	Drag the nodes of the bounding circle to adjust its radius. Make the limits larger or smaller by your preference.
+</p><br/>
+<h3>Move markers around</h3><br/>
+	<%= image_tag "demo/move.gif" %><br/>
+<p>
+	Click and drag route markers to adjust their position, along with the corresponding bounding circles. Hover over a marker to see the order with which it was created.
+</p><br/>
+<h3>Delete a route marker</h3><br/>
+	<%= image_tag "demo/delete.gif" %><br/>
+<p>
+	Delete a route marker and bounding circle by right clicking on the marker.
+</p><br/>
+<h3>Save route markers and bounds</h3><br/>
+	<%= image_tag "demo/update.gif" %><br/>
+<p>
+	Save your route markers and bounds by clicking the <em>Update Bounds</em> button below the Googlemap.
+</p><br/>
+<h3>View the Track</h3><br/>
+	<%= image_tag "demo/view.gif" %><br/>
+<p>
+	View the progress of your vehicle by clicking on <em>View</em>.
+</p><br/>
+<h3>Recognize your Vehicle</h3><br/>
+	<%= image_tag "demo/show.gif" %><br/>
+<p>
+	Once your vehicle's GPS device starts sending its location, your vehicle will appear as a blue bouncing marker on the Googlemap, in contrast to the red route markers and transparent bounds. You will be able to determine visually if your vehicle has crossed the bounds.
+</p><br/>
+<h3>Track your Vehicle's progress</h3><br/>
+	<%= image_tag "demo/review.gif" %><br/>
+<p>
+	Depending on the user specified interval to which the mobile app would send the Vehicle's current location, a live view of the progress can be seen. A dark blue line indicates the path your Vehicle has passed through.
+</p><br/>
+<h3>Know your vehicle coordinates and Status</h3><br/>
+ 
+	<%= image_tag "demo/current.jpg" %><br/>
+<p>
+	Your vehicles live coordinates and Car Status are displayed below the Googlemap.
+</p><br/>
+<h3>Options</h3><br/>
+	<%= image_tag "demo/options.gif" %><br/>
+<p>
+	Under <em>Account >> Options</em>, set 8 numbers as recepients of SMS notifications depending on the Car Status sent from the vehicle.
+</p><br/>
+<h3>Enter the contact numbers</h3><br/>
+	<%= image_tag "demo/numbers.gif" %><br/>
+<p>
+	Enter 1 number each per textbox and click the <em>Update Numbers</em> button. The text boxes may be blank.
+</p><br/>
+<h3>Change user setting</h3><br/>
+	<%= image_tag "demo/settings.gif" %><br/>
+<p>
+	You can change your information by at <em>Account >> Settings</em> and changing the desired fields. Password must always be reentered or changed.
+</p><br/>
+<h3>Signout</h3><br/>
+	<%= image_tag "demo/signout.jpg" %><br/>
+<p>
+	Cookies are created by signing in. To prevent anyone from accessing your account without consent, be sure to sign out at <em>Account >> Sign Out</em> to close your session.
+</p><br/>
+</div>
+</div>

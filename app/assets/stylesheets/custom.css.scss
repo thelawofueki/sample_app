@@ -17,7 +17,7 @@ html {
 }
 
 body {
-  padding-top: 60px;
+  padding-top: 50px;
 }
 
 section {
@@ -172,4 +172,23 @@ input {
 .field_with_errors {
   @extend .control-group;
   @extend .error;
+}
+
+/*Google maps*/
+
+/*Tutorial Page*/
+
+.tutorial {
+  border-top: 1px solid #000000;
+  margin-left: 120px;
+  padding-top: 50px;
+  width: 600px;
+}
+
+.tutorial h3 {
+  color: #357EC7;
+}
+
+.tutorial p {
+  text-indent: 50px;
 }

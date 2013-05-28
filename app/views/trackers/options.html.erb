@@ -1,0 +1,65 @@
+
+<div class="row">
+  <div class="span4 offset3">
+<div id="mainpart" class = "current-location" user-index="<%= @tracker.user_index %>">
+  <h3>Edit Contact Numbers</h3>
+    <form accept-charset="UTF-8"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /><input name="authenticity_token" type="hidden" value="NTIeuzj4ePshzQ8536OdYYN9wA4bw27eUluyATE/uIY=" /></div>
+      <label for="num1">1</label>
+      <input type="text" id="num1" size="30"/>
+      <label for="num2">2</label>
+      <input type="text" id="num2" size="30"/>
+      <label for="num3">3</label>
+      <input type="text" id="num3" size="30"/>
+      <label for="num4">4</label>
+      <input type="text" id="num4" size="30"/>
+      <label for="num5">5</label>
+      <input type="text" id="num5" size="30"/>
+      <label for="num6">6</label>
+      <input type="text" id="num6" size="30"/>
+      <label for="num7">7</label>
+      <input type="text" id="num7" size="30"/>
+      <label for="num8">8</label>
+      <input type="text" id="num8" size="30"/>
+    </form>
+
+  <button type="button" class="btn" onclick="saveToDatabase()">Update Numbers</button></br>
+
+</div>
+</div>
+</div>
+<script type="text/javascript">
+  var numbers = '<%=@tracker.contacs%>';
+  var allradii = numbers.split('*');
+
+  $(document).ready(function(){
+     for (i=0;i<8;i++)
+      {
+        $('#num'+(i+1)).val(allradii[i]);
+      }
+  });
+  
+
+  function saveToDatabase(){
+    var newnumbers = '';
+    for(i=1;i<9;i++)
+    {
+      if(i!=8)
+      {
+        var mediator = '*';
+      }
+      else
+      {
+        mediator = '';
+      }
+      newnumbers += $('#num'+i).val() + mediator;
+    }
+    params = {
+      contacs: newnumbers
+    }
+
+    $.post('/options', params, function(){
+      alert('Numbers updated.');
+    });
+  }
+</script>
+  

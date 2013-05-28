@@ -1,0 +1,75 @@
+		var all_curlats = '<%=@tracker.lat%>';
+		var all_curlongs = '<%=@tracker.longi%>';
+
+		var array_curlats = all_curlats.split("*");
+		var array_curlongs = all_curlongs.split("*");
+
+		$('#currentlat').html(array_curlats[array_curlats.length-1]);
+		$('#currentlong').html(array_curlongs[array_curlongs.length-1]);
+		$('#currentcarStat').html('' + array_curlats.length + '/' + vehicle.length);
+
+		
+		if (array_curlats.length > vehicle.length)
+		{
+			//$('#currentcarStat').html('Pumasok');
+			
+			for(i=vehicle.length; i<array_curlats.length;i++)
+			{
+				var newcoords = new google.maps.LatLng(parseFloat(array_curlats[i]), parseFloat(array_curlongs[i]));
+				if(i-1 != 0)
+				{
+					vehicle[i-1].setMap(null);	
+				}
+				//vehiclepath[vehiclepath.length] = newcoords;
+				vehicle[i] = new google.maps.Marker({
+						position: newcoords,
+						map: map,
+						icon: 'http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png',
+						animation: google.maps.Animation.BOUNCE,
+						title: '' + vehicle.length
+						});
+				var path = flightPath.getPath();
+		  		path.push(newcoords);
+		  		//$('#currentcarStat').html('i: ' + i);
+			}
+			/*
+			var newcoords = new google.maps.LatLng(parseFloat(array_curlats[i]), parseFloat(array_curlongs[i]));
+			vehicle[vehicle.length-1].setMap(null);
+				//vehiclepath[vehiclepath.length] = newcoords;
+				vehicle[vehicle.length] = new google.maps.Marker({
+						position: newcoords,
+						map: map,
+						icon: 'http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png',
+						animation: google.maps.Animation.BOUNCE,
+						title: '' + vehicle.length
+						});
+				var path = flightPath.getPath();
+		  		path.push(newcoords);
+			*/
+			
+		}
+		//$('#currentcarStat').html('session');
+		if(session == 0)
+		{
+			var newcoords = new google.maps.LatLng(parseFloat(array_curlats[0]), parseFloat(array_curlongs[0]));
+			//$('#currentcarStat').html('Before vehicle');
+			vehicle[0] = new google.maps.Marker({
+			position: newcoords,
+			map: map,
+			icon: 'http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png',
+			animation: google.maps.Animation.DROP,
+			title: '' + vehicle.length
+			});
+			//$('#currentcarStat').html('After Vehicle');
+			vehiclepath[0] = newcoords;
+			flightPath = new google.maps.Polyline({
+		    path: vehiclepath,
+		    strokeColor: '#15317E',
+		    strokeOpacity: 1.0,
+		    strokeWeight: 2
+	  		});
+			flightPath.setMap(map);
+			if ($('#currentlat').html() != ''){
+				session = 1;
+			}
+		}
